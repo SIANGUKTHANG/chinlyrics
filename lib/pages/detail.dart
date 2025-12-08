@@ -308,13 +308,15 @@ class _DetailsPageState extends State<DetailsPage> {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => LyricsViewer(
                                 title: widget.title,
-                                verse1: widget.verse1,
-                                verse2: widget.verse2,
-                                verse3: widget.verse3,
-                                verse4: widget.verse4,
-                                verse5: widget.verse5,
-                                endingChorus: widget.endingChorus,
-                                chorus: widget.chorus,
+                                verse1: widget.verse1??'',
+                                verse2: widget.verse2??'',
+                                verse3: widget.verse3??'',
+                                verse4: widget.verse4??'',
+                                verse5: widget.verse5??'',
+                                verse6:  '',
+                                verse7:  '',
+                                endingChorus: widget.endingChorus??'',
+                                chorus: widget.chorus??'',
                               )));
                     },
                     child: const Padding(

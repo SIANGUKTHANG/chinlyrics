@@ -71,39 +71,57 @@ class LyricsViewerState extends State<LyricsViewer> {
     List<Widget> lyricsPages = [];
 
     // Check if verse and chorus should be displayed together
-    if (widget.verse1 != null) {
-      lyricsPages.add(_buildVerse(widget.title,'Title', context));
-      lyricsPages.add(_buildVerse(widget.verse1,'verse', context));
-      if (widget.chorus != null) lyricsPages.add(_buildChorus(context));
-    }
-    if (widget.verse2 != null || widget.verse2 != '') {
-      lyricsPages.add(_buildVerse(widget.verse2,'verse', context));
-      if (widget.chorus != null ) lyricsPages.add(_buildChorus(context));
-    }
-    if (widget.verse3 != null || widget.verse3 != '') {
-      lyricsPages.add(_buildVerse(widget.verse3,'verse', context));
-      if (widget.chorus != null) lyricsPages.add(_buildChorus(context));
-    }
-    if (widget.verse4 != null || widget.verse4 != '') {
-      lyricsPages.add(_buildVerse(widget.verse4,'verse', context));
-      if (widget.chorus != null) lyricsPages.add(_buildChorus(context));
-    }
-    if (widget.verse5 != null || widget.verse5 != '') {
-      lyricsPages.add(_buildVerse(widget.verse5,'verse', context));
-      if (widget.chorus != null) lyricsPages.add(_buildChorus(context));
-    }
-    if (widget.verse6 != null || widget.verse6 != '') {
-      lyricsPages.add(_buildVerse(widget.verse6,'verse', context));
-      if (widget.chorus != null) lyricsPages.add(_buildChorus(context));
-    }
-    if (widget.verse7 != null|| widget.verse7 != '') {
-      lyricsPages.add(_buildVerse(widget.verse7,'verse', context));
-      if (widget.chorus != null) lyricsPages.add(_buildChorus(context));
+    if (widget.verse1 != null && widget.verse1!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.title, 'Title', context));
+      lyricsPages.add(_buildVerse(widget.verse1, 'verse 1', context));
+      if (widget.chorus != null && widget.chorus!.trim().isNotEmpty) {
+        lyricsPages.add(_buildChorus(context));
+      }
     }
 
-    if(widget.endingChorus !=null || widget.endingChorus !=''){
-      lyricsPages.add(_buildVerse(widget.endingChorus,'Ending', context));
+    if (widget.verse2 != null && widget.verse2!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.verse2, 'verse 2', context));
+      if (widget.chorus != null && widget.chorus!.trim().isNotEmpty) {
+        lyricsPages.add(_buildChorus(context));
+      }
     }
+    if (widget.verse3 != null && widget.verse3!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.verse3, 'verse 3', context));
+      if (widget.chorus != null && widget.chorus!.trim().isNotEmpty) {
+        lyricsPages.add(_buildChorus(context));
+      }
+    }
+
+    if (widget.verse4 != null && widget.verse4!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.verse4, 'verse 4', context));
+      if (widget.chorus != null && widget.chorus!.trim().isNotEmpty) {
+        lyricsPages.add(_buildChorus(context));
+      }
+    }
+    if (widget.verse5 != null && widget.verse5!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.verse5, 'verse 5', context));
+      if (widget.chorus != null && widget.chorus!.trim().isNotEmpty) {
+        lyricsPages.add(_buildChorus(context));
+      }
+    }
+    if (widget.verse6 != null && widget.verse6!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.verse6, 'verse 6', context));
+      if (widget.chorus != null && widget.chorus!.trim().isNotEmpty) {
+        lyricsPages.add(_buildChorus(context));
+      }
+    }
+
+    if (widget.verse7 != null && widget.verse7!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.verse7, 'verse 7', context));
+      if (widget.chorus != null && widget.chorus!.trim().isNotEmpty) {
+        lyricsPages.add(_buildChorus(context));
+      }
+    }
+
+    if (widget.endingChorus != null && widget.endingChorus!.trim().isNotEmpty) {
+      lyricsPages.add(_buildVerse(widget.endingChorus, 'Ending', context));
+    }
+
 
     return Scaffold(
 
@@ -187,9 +205,9 @@ class LyricsViewerState extends State<LyricsViewer> {
   }
 
   Widget _buildVerse(String? verse,String? type, BuildContext context) {
-    if (verse == null || verse == '') return Container();
+  //  if (verse == null || verse == '') return Container();
 
-    String cleanLyrics = removeChords(verse);
+    String cleanLyrics = removeChords(verse!);
 
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16),
@@ -216,7 +234,7 @@ class LyricsViewerState extends State<LyricsViewer> {
   }
 
   Widget _buildChorus(BuildContext context) {
-    if (widget.chorus == null || widget.chorus == '') return Container();
+   // if (widget.chorus == null || widget.chorus == '') return Container();
 
     String cleanChorus = removeChords(widget.chorus!);
 

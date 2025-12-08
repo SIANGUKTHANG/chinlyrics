@@ -55,15 +55,15 @@ class _HlaBuDetailState extends State<HlaBuDetail> {
       IconButton(onPressed:(){
         Navigator.of(context).push(MaterialPageRoute(builder: (context)=> LyricsViewer(
           title: widget.title,
-          verse1: widget.verse1,
-          verse2: widget.verse2,
-          verse3: widget.verse3,
-          verse4: widget.verse4,
-          verse5: widget.verse5,
-          verse6: widget.verse6,
-
-          verse7: widget.verse7,
-          chorus: widget.chorus,
+          verse1: widget.verse1??"",
+          verse2: widget.verse2??"",
+          verse3: widget.verse3??"",
+          verse4: widget.verse4??"",
+          verse5: widget.verse5??"",
+          verse6: widget.verse6??"",
+          verse7: widget.verse7??"",
+          chorus: widget.chorus??"",
+          endingChorus:  "",
         )));
       }, icon: const Icon(Icons.slideshow)),
       const SizedBox(width: 4,)
