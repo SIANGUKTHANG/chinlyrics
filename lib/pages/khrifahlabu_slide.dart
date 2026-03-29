@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class LyricsViewer extends StatefulWidget {
   final String? title;
@@ -219,7 +218,7 @@ class LyricsViewerState extends State<LyricsViewer> {
            Text('( $type )',style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.orange),),
             Text(
               cleanLyrics,
-              style: GoogleFonts.actor(
+              style: TextStyle(
                 fontSize: getFontSize(context),
                 color: Colors.white70,
                fontWeight: FontWeight.w700
@@ -247,7 +246,7 @@ class LyricsViewerState extends State<LyricsViewer> {
 
             Text(
               cleanChorus,
-              style: GoogleFonts.actor(
+              style: TextStyle(
                   fontSize: getFontSize(context),
                   color: Colors.white70,
                   fontWeight: FontWeight.w700,

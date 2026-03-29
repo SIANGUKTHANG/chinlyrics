@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ChawngHlangSlide extends StatefulWidget {
   final String? title;
@@ -106,7 +105,7 @@ class _ChawngHlangSlideState extends State<ChawngHlangSlide> {
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: GoogleFonts.aclonica(fontSize: getFontSize(context), color: Colors.white70),
+        style: TextStyle(fontSize: getFontSize(context), color: Colors.white70),
       ),
     );
   }
@@ -119,7 +118,7 @@ class _ChawngHlangSlideState extends State<ChawngHlangSlide> {
 
       child: Text(
         text,
-        style: GoogleFonts.aclonica(fontSize: getFontSize(context), color: Colors.blue),
+        style: TextStyle(fontSize: getFontSize(context), color: Colors.blue),
         textAlign: TextAlign.center,
       ),
     );

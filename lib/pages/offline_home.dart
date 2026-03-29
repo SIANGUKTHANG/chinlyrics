@@ -1,92 +1,52 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-import 'package:chinlyrics/ads_manager.dart';
-import 'package:dio/dio.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:http/http.dart' as http;
+import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import '../constant.dart';
+import '../ads_manager.dart';
 import 'detail.dart';
+import 'edit_song.dart';
 
 bool hasLoadedSongsOnce = false;
 
-// ignore: must_be_immutable
 class OfflineHome extends StatefulWidget {
-  OfflineHome({super.key});
-
-  var listData = [];
+  const OfflineHome({super.key});
 
   @override
   State<OfflineHome> createState() => _OfflineHomeState();
 }
 
 class _OfflineHomeState extends State<OfflineHome> {
-  var data = [];
+  final Box userBox = Hive.box('userBox');
   String category = 'all';
-  bool isAdsLoading = false;
-  bool isLoading = false;
-  bool isConnected = false;
-  bool raise = false;
-  bool adReady = false;
-  int random = Random().nextInt(4) + 1;
-  late BannerAd banner;
-  RewardedAd? _rewardedAd;
+  List<dynamic> allSongs = [];
+  List<dynamic> visibleSongs = [];
   int tapCount = 0;
+  RewardedAd? _rewardedAd;
+  bool adReady = false;
+  bool isAdsLoading = false;
+  late BannerAd banner;
+  Timer? _debounce;
   TextEditingController textEditingController = TextEditingController();
-  var searchHistory = [];
-  int updateList = 0;
-
-  /// Loads a rewarded ad.
-  void loadAd() {
-    RewardedAd.load(
-      adUnitId: AdHelper.rewardedAdUnitId,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        // Called when an ad is successfully received.
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-              // Called when the ad showed the full screen content.
-              onAdShowedFullScreenContent: (ad) {},
-              // Called when an impression occurs on the ad.
-              onAdImpression: (ad) {},
-              // Called when the ad failed to show full screen content.
-              onAdFailedToShowFullScreenContent: (ad, err) {
-                // Dispose the ad here to free resources.
-                ad.dispose();
-              },
-              // Called when the ad dismissed full screen content.
-              onAdDismissedFullScreenContent: (ad) {
-                ad.dispose();
-                loadAd();
-              },
-              // Called when a click is recorded for an ad.
-              onAdClicked: (ad) {});
-
-          setState(() {
-            adReady = true;
-          });
-
-          // Keep a reference to the ad so you can show it later.
-          _rewardedAd = ad;
-        },
-        // Called when an ad request failed.
-        onAdFailedToLoad: (LoadAdError error) {
-          debugPrint('RewardedAd failed to load: $error');
-        },
-      ),
-    );
-  }
 
   @override
   void initState() {
-/*
-  loadAd();
+    super.initState();
 
+    readLocal();
+    if (!hasLoadedSongsOnce) {
+      hasLoadedSongsOnce = true;
+      readAndRetrieve();
+    }
+
+/*    loadAd();
     banner = BannerAd(
       adUnitId: AdHelper.homeBannerAdUnitId,
       size: AdSize.fullBanner,
@@ -102,330 +62,373 @@ class _OfflineHomeState extends State<OfflineHome> {
           ad.dispose();
         },
       ),
-    )..load();
-*/
-
-    readLocal();
-    if (!hasLoadedSongsOnce) {
-      hasLoadedSongsOnce = true;
-      checkData();
-    }
-
-    super.initState();
+    )..load();*/
   }
 
-  Future<void> checkData() async {
-    const fileName = 'hla';
-    final dir = await getTemporaryDirectory();
-    final filePath = '${dir.path}/$fileName';
-    final file = File(filePath);
+  void loadAd() {
+    RewardedAd.load(
+      adUnitId: AdHelper.rewardedAdUnitId,
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdShowedFullScreenContent: (ad) {},
+            onAdImpression: (ad) {},
+            onAdFailedToShowFullScreenContent: (ad, err) {
+              ad.dispose();
+            },
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              loadAd();
+            },
+            onAdClicked: (ad) {},
+          );
+
+          setState(() {
+            adReady = true;
+          });
+
+          _rewardedAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('RewardedAd failed to load: $error');
+        },
+      ),
+    );
+  }
+
+  // A DIKMI FETCH NING (1 Read in Metadata lak)
+  Future<void> readAndRetrieve({bool forceRefresh = false}) async {
+    if (kDebugMode) {
+      print('Firebase in Metadata (part_1) lak a si...');
+    }
 
     try {
-      // 1. Load from local file immediately
-      if (await file.exists()) {
-        final localData = json.decode(await file.readAsString()) as List;
+      if (allSongs.isEmpty || forceRefresh) {
+        // 1. 'metadata' document pakhat te lawng lak
+        DocumentSnapshot indexDoc = await FirebaseFirestore.instance
+            .collection('metadata')
+            .doc('part_1')
+            .get(const GetOptions(source: Source.serverAndCache));
 
-        // fetch from API
-        final response = await http.get(
-            Uri.parse('https://laihlalyrics.itrungrul.com/api/songs/length'));
-        final data = jsonDecode(response.body);
+        if (indexDoc.exists && indexDoc.data() != null) {
+          Map<String, dynamic> data = indexDoc.data() as Map<String, dynamic>;
+          Map<String, dynamic> songsMap = data['songs_map'] ?? {};
 
-        int newLength = data['length'];
+          List<dynamic> newData = [];
 
-        // compare
-        bool hasChanged = localData.length != newLength;
-        if(hasChanged){
-          readAndRetrieve();
+          // 2. Map chung i data kha List ah thlen
+          songsMap.forEach((key, value) {
+            newData.add({
+              'id': key,
+              // Hla ID (Mah hi Detail Page ah kan ap lai)
+              'title': value['title'] ?? 'Untitled',
+              'singer': value['singer'] ?? 'Unknown artist',
+              'chord': value['chord'] ?? false,
+              'songtrack': value['track'] ?? '',
+              // UI he aa mil nakhnga
+              // Note: 'category' cu index ah a tel lo caah a tanglei ah filter kan remh tlawmpal lai
+            });
+          });
+
+          // ABC in remhnak
+          newData.sort((a, b) => (a["title"] ?? "")
+              .toString()
+              .toLowerCase()
+              .compareTo((b["title"] ?? "").toString().toLowerCase()));
+
+          if (!mounted) return;
+          setState(() {
+            allSongs = newData;
+            visibleSongs = newData;
+          });
+
+          const fileName = 'laihlalyrics';
+          final dir = await getApplicationDocumentsDirectory();
+          final file = File('${dir.path}/$fileName');
+          await compute(jsonEncode, newData).then((value) {
+            return file.writeAsString(value);
+          });
+
+          debugPrint("Metadata in data thar lak le save a si cang.");
         }
-
       } else {
-        readAndRetrieve();
+        debugPrint("Data aa thleng lo. Local data kan hmang ko lai.");
       }
     } catch (e) {
-      readLocal();
-      debugPrint("Failed to read or download JSON: $e");
-    }
-  }
-
-  Future<void> readAndRetrieve() async {
- setState(() {
-   isLoading = true;
- });
-    const fileName = 'hla';
-    final dir = await getTemporaryDirectory();
-    final filePath = '${dir.path}/$fileName';
-    final file = File(filePath);
-
-    try {
-
-      // 2. Download latest version in background
-      await Dio().download(
-        url, // Make sure you defined this as your server file URL
-        filePath,
-      );
-
-      // 3. Reload after successful download
-      final newData = json.decode(await file.readAsString()) as List;
-
-      newData.sort((a, b) =>
-          a["title"].toLowerCase().compareTo(b["title"].toLowerCase()));
-
-      setState(() {
-        widget.listData = newData;
-        data = newData;
-        isLoading = false;
-      });
-
-      debugPrint("Data updated from latest download.");
-    } catch (e) {
-      debugPrint("Failed to read or download JSON: $e");
-     setState(() {
-       isLoading = false;
-     });
+      debugPrint("Data check/lak lio ah palhnak a um: $e");
     }
   }
 
   Future<void> readLocal() async {
-    if (kDebugMode) {
-      print('call local');
-    }
-    const fileName = 'hla';
-    final dir = await getTemporaryDirectory();
+    const fileName = 'laihlalyrics';
+    final dir = await getApplicationDocumentsDirectory();
     final filePath = '${dir.path}/$fileName';
     final file = File(filePath);
 
     try {
-      // 1. Load from local file immediately
       if (await file.exists()) {
         final localData = json.decode(await file.readAsString()) as List;
 
-        localData.sort((a, b) =>
-            a["title"].toLowerCase().compareTo(b["title"].toLowerCase()));
+        localData.sort((a, b) => (a["title"] ?? "")
+            .toString()
+            .toLowerCase()
+            .compareTo((b["title"] ?? "").toString().toLowerCase()));
 
         setState(() {
-          widget.listData = localData;
-          data = localData;
+          allSongs = localData;
+          visibleSongs = localData;
         });
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      if (kDebugMode) print(e);
     }
-  }
-
-  void _filterJsonData(String searchTerm, category) {
-    setState(() {
-      widget.listData = data.where((element) {
-        final categ = element['category'];
-        final title = element['title'].toLowerCase();
-        final singer = element['singer'].toLowerCase();
-        final searchLower = searchTerm.toLowerCase();
-
-        return category == 'all'
-            ? title.contains(searchLower) || singer.contains(searchLower)
-            : (title.contains(searchLower) || singer.contains(searchLower)) &&
-                categ.contains(category);
-      }).toList();
-    });
   }
 
   @override
   void dispose() {
-    // banner.dispose();
-    // _rewardedAd?.dispose();
+    if (isAdsLoading) {
+      banner.dispose();
+    }
+    _rewardedAd?.dispose();
+    textEditingController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const SizedBox(),
-        title: SearchBar(
-          onChanged: (value) {
-            _filterJsonData(value, category);
-          },
-          hintText: 'title or singer ',
-          hintStyle: WidgetStateProperty.all(GoogleFonts.alike(fontSize: 20)),
-          trailing: [
-            DropdownButton<String>(
-              value: category,
-              icon:
-                  const Icon(Icons.filter_list_rounded, color: Colors.white70),
-              style: const TextStyle(color: Colors.white70),
-              underline: Container(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  category = newValue!;
-
-                  if (category == 'all') {
-                    widget.listData = data;
-                  } else {
-                    widget.listData =
-                        data.where((e) => e['category'] == category).toList();
-                  }
-                });
-              },
-              items: const [
-                DropdownMenuItem(value: 'all', child: Text('All Songs')),
-                DropdownMenuItem(
-                    value: 'pathian-hla', child: Text('Pathian Hla')),
-                DropdownMenuItem(
-                    value: 'christmas-hla', child: Text('Christmas Hla')),
-                DropdownMenuItem(
-                    value: 'kumthar-hla', child: Text('Kumthar Hla')),
-                DropdownMenuItem(
-                    value: 'thitumnak-hla', child: Text('Thitum Hla')),
-                DropdownMenuItem(value: 'ram-hla', child: Text('Ram Hla')),
-                DropdownMenuItem(value: 'zun-hla', child: Text('Zun Hla')),
-                DropdownMenuItem(
-                    value: 'hladang', child: Text('Hla Dang Dang')),
-              ],
-            )
-          ],
-        ),
-      ),
       bottomSheet: isAdsLoading
           ? Container(
               margin: const EdgeInsets.symmetric(horizontal: 10),
               height: AdSize.banner.height.toDouble(),
               width: MediaQuery.of(context).size.width,
-              child: AdWidget(
-                ad: banner,
-              ))
-          : Container(
-              height: 1,
-            ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          checkData();
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            isLoading
+              child: AdWidget(ad: banner),
+            )
+          : const SizedBox(height: 1),
+      body: Column(
+        children: [
+          const SizedBox(height: 60),
+          _buildSearchBar(),
+          Expanded(
+            child: visibleSongs.isEmpty
                 ? const Center(
-                    child: CircularProgressIndicator(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("No songs found.",
+                            style: TextStyle(
+                                color: Colors.white70,
+                                fontWeight: FontWeight.bold)),
+                        Text("Try searching something else.",
+                            style: TextStyle(
+                              color: Colors.white70,
+                            )),
+                      ],
+                    ),
                   )
-                : Expanded(
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      await readAndRetrieve(forceRefresh: true);
+                    },
                     child: ListView.builder(
-                        itemCount: widget.listData.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: ListTile(
-                                  onTap: () {
-                                    tapCount++;
-                                    if (adReady && tapCount >= 3) {
-                                      tapCount = 0;
-                                      _rewardedAd?.show(onUserEarnedReward:
-                                          (AdWithoutView ad,
-                                              RewardItem rewardItem) {
-                                        // Reward the user for watching an ad.
-                                        Get.to(()=>DetailsPage(
-                                          title: widget.listData[index]
-                                              ['title'],
-                                          chord: widget.listData[index]
-                                              ['chord'],
-                                          singer: widget.listData[index]
-                                              ['singer'],
-                                          composer: widget.listData[index]
-                                              ['composer'],
-                                          verse1: widget.listData[index]
-                                              ['verse1'],
-                                          verse2: widget.listData[index]
-                                              ['verse2'],
-                                          verse3: widget.listData[index]
-                                              ['verse3'],
-                                          verse4: widget.listData[index]
-                                              ['verse4'],
-                                          verse5: widget.listData[index]
-                                              ['verse5'],
-                                          songtrack: widget.listData[index]
-                                              ['songtrack'],
-                                          chorus: widget.listData[index]
-                                              ['chorus'],
-                                          endingChorus: widget.listData[index]
-                                              ['endingchorus'],
-                                        ));
-                                      });
-                                    } else {
-                                      Get.to(()=>DetailsPage(
-                                        title: widget.listData[index]
-                                                ['title'] ??
-                                            '',
-                                        chord: widget.listData[index]
-                                                ['chord'] ??
-                                            false,
-                                        singer: widget.listData[index]
-                                                ['singer'] ??
-                                            '',
-                                        composer: widget.listData[index]
-                                                ['composer'] ??
-                                            '',
-                                        verse1: widget.listData[index]
-                                                ['verse1'] ??
-                                            '',
-                                        verse2: widget.listData[index]
-                                                ['verse2'] ??
-                                            '',
-                                        verse3: widget.listData[index]
-                                                ['verse3'] ??
-                                            '',
-                                        verse4: widget.listData[index]
-                                                ['verse4'] ??
-                                            '',
-                                        verse5: widget.listData[index]
-                                                ['verse5'] ??
-                                            '',
-                                        songtrack: widget.listData[index]
-                                                ['songtrack'] ??
-                                            '',
-                                        chorus: widget.listData[index]
-                                                ['chorus'] ??
-                                            '',
-                                        endingChorus: widget.listData[index]
-                                                ['endingchorus'] ??
-                                            "",
-                                      ));
-                                    }
-                                  },
-                                  leading:
-                                      widget.listData[index]['songtrack'] != ''
-                                          ? const Icon(
-                                              Icons.mic_external_on_sharp,
-                                              color: Colors.red,
-                                            )
-                                          : const Icon(
-                                              Icons.music_note,
-                                              color: Colors.white,
-                                            ),
-                                  title: Text(
-                                    "'${widget.listData[index]['title']}'",
-                                    style: GoogleFonts.zillaSlab(
-                                        color: Colors.white),
-                                  ),
-                                  subtitle: Text(
-                                    widget.listData[(index)]['singer'],
-                                    style: GoogleFonts.beauRivage(
-                                        color: Colors.white70),
-                                  ),
-                                  trailing: widget.listData[index]['chord']
-                                      ? const Icon(Icons.piano)
-                                      : const SizedBox(),
-                                ),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      itemCount: visibleSongs.length,
+                      itemBuilder: (context, index) {
+                        final item = visibleSongs[index];
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 2),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white10,
+                                width: 1.5,
                               ),
-                            ],
-                          );
-                        }),
+                            ),
+                            child: ListTile(
+                              onLongPress: () =>
+                                  _showActionDialog(context, item['id'], item),
+                              onTap: () {
+                                tapCount++;
+                                if (adReady && tapCount >= 2) {
+                                  tapCount = 0;
+                                  _rewardedAd?.show(
+                                    onUserEarnedReward: (AdWithoutView ad,
+                                        RewardItem rewardItem) {
+                                      _navigateToDetail(item);
+                                    },
+                                  );
+                                } else {
+                                  _navigateToDetail(item);
+                                }
+                              },
+                              leading: item['songtrack'] != null && item['songtrack'] != ''
+                                  ? const Icon(Icons.mic, color: Colors.red)
+                                  : const Icon(Icons.music_note,
+                                      color: Colors.white),
+                              title: Text(
+                                "'${item['title'] ?? 'Unknown'}'",
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              subtitle: Text(
+                                item['singer'] ?? 'Unknown Artist',
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+                              trailing: item['chord'] == true
+                                  ? const Icon(Icons.piano, color: Colors.blue)
+                                  : const SizedBox(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-            SizedBox(height: AdSize.banner.height.toDouble()),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // BIAPI: Detail Page ah ID le Title lawng ap a si cang
+  void _navigateToDetail(dynamic item) {
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>
+        DetailsPage(
+          songId: item['id'], // <-- ID ap a si
+          title: item['title'] ?? '', // <-- Title ap a si
+          // Verse pawl ap a hau ti lo!
+        )));
+
+  }
+
+  Widget _buildSearchBar() {
+    return Row(
+      children: [
+        const SizedBox(width: 5),
+        Expanded(
+          child: _buildSearchField(),
+        ),
+        const SizedBox(width: 10),
+        // _buildCategoryDropdown(),
+        const SizedBox(width: 10),
+      ],
+    );
+  }
+
+  TextFormField _buildSearchField() {
+    return TextFormField(
+      controller: textEditingController,
+      maxLines: 1,
+      cursorColor: Colors.white70,
+      cursorHeight: 20,
+      onChanged: (value) {
+        if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+        _debounce = Timer(const Duration(milliseconds: 100), () {
+          _filterSongs(value, category);
+        });
+      },
+      decoration: InputDecoration(
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        hintText: 'Search by title or singer',
+        hintStyle: const TextStyle(color: Colors.white70),
+        filled: true,
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.white54, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.white38, width: 1.0),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            textEditingController.clear();
+            _filterSongs('', category);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _filterSongs(String searchTerm, String currentCategory) {
+    setState(() {
+      visibleSongs = allSongs.where((element) {
+        final title = (element['title'] ?? '').toString().toLowerCase();
+        final singer = (element['singer'] ?? '').toString().toLowerCase();
+        final searchLower = searchTerm.toLowerCase();
+
+        bool matchesSearch =
+            title.contains(searchLower) || singer.contains(searchLower);
+        return matchesSearch;
+        // Note: Category filtering cu atu lio ahcun ka phih rih, zeicahtiah Index ah category kan rak save lo.
+      }).toList();
+    });
+  }
+
+  // A BIAPI: Hika ah docId timi String in kan thlen cang
+  void _showActionDialog(
+      BuildContext context, String docId, Map<String, dynamic> data) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    final bool isAdmin = currentUser?.email == 'itrungrul@gmail.com';
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: Text(data['title'] ?? 'Options'),
+        message: const Text('Zeidah tuah na duh?'),
+        actions: [
+          if (isAdmin)
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                firestore.DocumentSnapshot doc = await firestore
+                    .FirebaseFirestore.instance
+                    .collection('hla')
+                    .doc(docId)
+                    .get(const firestore.GetOptions(
+                        source: firestore.Source.serverAndCache));
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditLyrics(
+                      doc: doc,
+                    ),
+                  ),
+                ).then((_) => readAndRetrieve(forceRefresh: true));
+              },
+              child: const Text('Edit Chord'),
+            ),
+          if (isAdmin)
+            CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () async {
+                // docId hmangin hloh a si
+                await FirebaseFirestore.instance
+                    .collection('hla')
+                    .doc(docId)
+                    .delete();
+                await firestore.FirebaseFirestore.instance
+                    .collection('metadata')
+                    .doc('part_1')
+                    .update({
+                  'songs_map.$docId': firestore.FieldValue.delete(),
+                });
+                readAndRetrieve(forceRefresh: true);
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
+            ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
         ),
       ),
     );

@@ -1,15 +1,27 @@
-import 'package:banner_carousel/banner_carousel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_guitar_chord/flutter_guitar_chord.dart';
+import 'package:guitar_chord_library/guitar_chord_library.dart';
 
-class Chords extends StatefulWidget {
-  const Chords({Key? key}) : super(key: key);
+class ChordsLibrary extends StatefulWidget {
+  const ChordsLibrary({super.key});
 
   @override
-  State<Chords> createState() => _ChordsState();
+  State<ChordsLibrary> createState() => _ChordsLibraryState();
 }
 
-class _ChordsState extends State<Chords> with SingleTickerProviderStateMixin {
+class _ChordsLibraryState extends State<ChordsLibrary> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  // Chord List (Tab pakhat cio ah a langh dingmi chord cazin)
+  final Map<String, List<String>> tabChords = {
+    'A': ['A', 'Am', 'A7', 'Am7', 'Amaj7', 'Asus4', 'A#', 'A#m', 'A#7', 'A#maj7', 'A#sus4', 'A#sus2'],
+    'B': ['B', 'Bm', 'B7', 'Bm7', 'Bmaj7', 'Bsus4'],
+    'C': ['C', 'Cm', 'C7', 'Cm7', 'Cmaj7', 'Csus4', 'C#', 'C#m', 'C#7', 'C#maj7', 'C#sus4', 'C#sus2'],
+    'D': ['D', 'Dm', 'D7', 'Dm7', 'Dmaj7', 'Dsus4', 'D#', 'D#m', 'D#7', 'D#maj7', 'D#sus4', 'D#sus2'],
+    'E': ['E', 'Em', 'E7', 'Em7', 'Emaj7', 'Esus4'],
+    'F': ['F', 'Fm', 'F7', 'Fm7', 'Fmaj7', 'Fsus4', 'F#', 'F#m', 'F#7', 'F#maj7', 'F#sus4', 'F#sus2'],
+    'G': ['G', 'Gm', 'G7', 'Gm7', 'Gmaj7', 'Gsus4', 'G#', 'G#m', 'G#7', 'G#maj7', 'G#sus4', 'G#sus2'],
+  };
 
   @override
   void didChangeDependencies() {
@@ -26,695 +38,186 @@ class _ChordsState extends State<Chords> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.black12,
-          leading: Container(),
-          title: const Text('Chords Library'),
-          bottom: TabBar(
-            isScrollable: false,
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'A'),
-              Tab(text: 'B'),
-              Tab(text: 'C'),
-              Tab(text: 'D'),
-              Tab(text: 'E'),
-              Tab(text: 'F'),
-              Tab(text: 'G'),
-            ],
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            'Chords Library',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
-        body: TabBarView(
+        bottom: TabBar(
+          isScrollable: false,
           controller: _tabController,
-          children: [
-            //A
-            ListView(
-              children: [
-                //A
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/A.png'),
-                    Image.asset('assets/chords/A (1).png'),
-                    Image.asset('assets/chords/A (2).png'),
-                    Image.asset('assets/chords/A (3).png'),
-                    Image.asset('assets/chords/A (4).png'),
-                    Image.asset('assets/chords/A (5).png'),
-                    Image.asset('assets/chords/A (6).png'),
-                  ],
-                ),
-                //Am
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Am.png'),
-                    Image.asset('assets/chords/Am (1).png'),
-                    Image.asset('assets/chords/Am (2).png'),
-                  ],
-                ),
-                //A7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/A7.png'),
-                    Image.asset('assets/chords/A7 (1).png'),
-                    Image.asset('assets/chords/A7 (2).png'),
-                    Image.asset('assets/chords/A7 (3).png'),
-                  ],
-                ),
-
-                //Am7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Am7.png'),
-                    Image.asset('assets/chords/Am7 (1).png'),
-                    Image.asset('assets/chords/Am7 (2).png'),
-                  ],
-                ),
-                //Amaj7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Amaj7.png'),
-                    Image.asset('assets/chords/Amaj7 (1).png'),
-                    Image.asset('assets/chords/Amaj7 (2).png'),
-                    Image.asset('assets/chords/Amaj7 (3).png'),
-                    Image.asset('assets/chords/Amaj7 (4).png'),
-                    Image.asset('assets/chords/Amaj7 (5).png'),
-                  ],
-                ),
-                //Asus4
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Asus4.png'),
-                    Image.asset('assets/chords/Asus4 (1).png'),
-                    Image.asset('assets/chords/Asus4 (2).png'),
-                  ],
-                ),
-              ],
-            ),
-            //B
-            ListView(
-              children: [
-                //A
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/B.png'),
-                    Image.asset('assets/chords/B (1).png'),
-                    Image.asset('assets/chords/B (2).png'),
-                    Image.asset('assets/chords/B (3).png'),
-                    Image.asset('assets/chords/B (4).png'),
-                    Image.asset('assets/chords/B (5).png'),
-                    Image.asset('assets/chords/B (6).png'),
-                  ],
-                ),
-                //Am
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Bm.png'),
-                    Image.asset('assets/chords/Bm (1).png'),
-                    Image.asset('assets/chords/Bm (2).png'),
-                  ],
-                ),
-                //A7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/B7.png'),
-                    Image.asset('assets/chords/B7 (1).png'),
-                    Image.asset('assets/chords/B7 (2).png'),
-                    Image.asset('assets/chords/B7 (3).png'),
-                    Image.asset('assets/chords/B7 (4).png'),
-                  ],
-                ),
-
-                //Am7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Bm7.png'),
-                    Image.asset('assets/chords/Bm7 (1).png'),
-                    Image.asset('assets/chords/Bm7 (2).png'),
-                  ],
-                ),
-                //Amaj7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Bmaj7.png'),
-                    Image.asset('assets/chords/Bmaj7 (1).png'),
-                    Image.asset('assets/chords/Bmaj7 (2).png'),
-                    Image.asset('assets/chords/Bmaj7 (3).png'),
-                    Image.asset('assets/chords/Bmaj7 (4).png'),
-                    Image.asset('assets/chords/Bmaj7 (5).png'),
-                  ],
-                ),
-                //Asus4
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Bsus4.png'),
-                    Image.asset('assets/chords/Bsus4 (1).png'),
-                    Image.asset('assets/chords/Bsus4 (2).png'),
-                  ],
-                ),
-              ],
-            ),
-            //C
-            ListView(
-              children: [
-                //A
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/c.png'),
-                    Image.asset('assets/chords/c (1).png'),
-                    Image.asset('assets/chords/c (2).png'),
-                    Image.asset('assets/chords/c (3).png'),
-                    Image.asset('assets/chords/c (4).png'),
-                    Image.asset('assets/chords/c (5).png'),
-                    Image.asset('assets/chords/c (6).png'),
-                  ],
-                ),
-                //Am
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Cm.png'),
-                    Image.asset('assets/chords/Cm (1).png'),
-                    Image.asset('assets/chords/Cm (2).png'),
-                  ],
-                ),
-                //A7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/C7.png'),
-                    Image.asset('assets/chords/C7 (1).png'),
-                    Image.asset('assets/chords/C7 (2).png'),
-                    Image.asset('assets/chords/C7 (3).png'),
-                  ],
-                ),
-
-                //Am7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Cm7.png'),
-                    Image.asset('assets/chords/Cm7 (1).png'),
-                    Image.asset('assets/chords/Cm7 (2).png'),
-                  ],
-                ),
-                //Amaj7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Cmaj7.png'),
-                    Image.asset('assets/chords/Cmaj7 (1).png'),
-                    Image.asset('assets/chords/Cmaj7 (2).png'),
-                    Image.asset('assets/chords/Cmaj7 (3).png'),
-                    Image.asset('assets/chords/Cmaj7 (4).png'),
-                    Image.asset('assets/chords/Cmaj7 (5).png'),
-                  ],
-                ),
-                //Asus4
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Csus4.png'),
-                    Image.asset('assets/chords/Csus4 (1).png'),
-                    Image.asset('assets/chords/Csus4 (2).png'),
-                  ],
-                ),
-              ],
-            ),
-            //D
-            ListView(
-              children: [
-                //A
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/D.png'),
-                    Image.asset('assets/chords/D (1).png'),
-                    Image.asset('assets/chords/D (2).png'),
-                    Image.asset('assets/chords/D (3).png'),
-                    Image.asset('assets/chords/D (4).png'),
-                    Image.asset('assets/chords/D (5).png'),
-                    Image.asset('assets/chords/D (6).png'),
-                  ],
-                ),
-                //Am
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Dm.png'),
-                    Image.asset('assets/chords/Dm (1).png'),
-                    Image.asset('assets/chords/Dm (2).png'),
-                  ],
-                ),
-                //A7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/D7.png'),
-                    Image.asset('assets/chords/D7 (1).png'),
-                    Image.asset('assets/chords/D7 (2).png'),
-                    Image.asset('assets/chords/D7 (3).png'),
-                  ],
-                ),
-
-                //Am7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Dm7.png'),
-                    Image.asset('assets/chords/Dm7 (1).png'),
-                    Image.asset('assets/chords/Dm7 (2).png'),
-                  ],
-                ),
-                //Amaj7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Dmaj7.png'),
-                    Image.asset('assets/chords/Dmaj7 (1).png'),
-                    Image.asset('assets/chords/Dmaj7 (2).png'),
-                    Image.asset('assets/chords/Dmaj7 (3).png'),
-                    Image.asset('assets/chords/Dmaj7 (4).png'),
-                    Image.asset('assets/chords/Dmaj7 (5).png'),
-                  ],
-                ),
-                //Asus4
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Dsus4.png'),
-                    Image.asset('assets/chords/Dsus4 (1).png'),
-                    Image.asset('assets/chords/Dsus4 (2).png'),
-                  ],
-                ),
-              ],
-            ),
-            //E
-            ListView(
-              children: [
-                //A
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/E.png'),
-                    Image.asset('assets/chords/E (1).png'),
-                    Image.asset('assets/chords/E (2).png'),
-                    Image.asset('assets/chords/E (3).png'),
-                    Image.asset('assets/chords/E (4).png'),
-                    Image.asset('assets/chords/E (5).png'),
-                    Image.asset('assets/chords/E (6).png'),
-                  ],
-                ),
-                //Am
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Em.png'),
-                    Image.asset('assets/chords/Em (1).png'),
-                    Image.asset('assets/chords/Em (2).png'),
-                  ],
-                ),
-                //A7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/E7.png'),
-                    Image.asset('assets/chords/E7 (1).png'),
-                    Image.asset('assets/chords/E7 (2).png'),
-                    Image.asset('assets/chords/E7 (3).png'),
-                  ],
-                ),
-
-                //Am7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Em7.png'),
-                    Image.asset('assets/chords/Em7 (1).png'),
-                    Image.asset('assets/chords/Em7 (2).png'),
-                  ],
-                ),
-                //Amaj7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Emaj7.png'),
-                    Image.asset('assets/chords/Emaj7 (1).png'),
-                    Image.asset('assets/chords/Emaj7 (2).png'),
-                    Image.asset('assets/chords/Emaj7 (3).png'),
-                    Image.asset('assets/chords/Emaj7 (4).png'),
-                    Image.asset('assets/chords/Emaj7 (5).png'),
-                  ],
-                ),
-                //Asus4
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Esus4.png'),
-                    Image.asset('assets/chords/Esus4 (1).png'),
-                    Image.asset('assets/chords/Esus4 (2).png'),
-                  ],
-                ),
-              ],
-            ),
-            //F
-            ListView(
-              children: [
-                //A
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/F.png'),
-                    Image.asset('assets/chords/F (1).png'),
-                    Image.asset('assets/chords/F (2).png'),
-                    Image.asset('assets/chords/F (3).png'),
-                    Image.asset('assets/chords/F (4).png'),
-                    Image.asset('assets/chords/F (5).png'),
-                    Image.asset('assets/chords/F (6).png'),
-                  ],
-                ),
-                //Am
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Fm.png'),
-                    Image.asset('assets/chords/Fm (1).png'),
-                    Image.asset('assets/chords/Fm (2).png'),
-                  ],
-                ),
-                //A7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/F7.png'),
-                    Image.asset('assets/chords/F7 (1).png'),
-                    Image.asset('assets/chords/F7 (2).png'),
-                    Image.asset('assets/chords/F7 (3).png'),
-                  ],
-                ),
-
-                //Am7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Fm7.png'),
-                    Image.asset('assets/chords/Fm7 (1).png'),
-                    Image.asset('assets/chords/Fm7 (2).png'),
-                  ],
-                ),
-                //Amaj7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Fmaj7.png'),
-                    Image.asset('assets/chords/Fmaj7 (1).png'),
-                    Image.asset('assets/chords/Fmaj7 (2).png'),
-                    Image.asset('assets/chords/Fmaj7 (3).png'),
-                    Image.asset('assets/chords/Fmaj7 (4).png'),
-                    Image.asset('assets/chords/Fmaj7 (5).png'),
-                  ],
-                ),
-                //Asus4
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Fsus4.png'),
-                    Image.asset('assets/chords/Fsus4 (1).png'),
-                    Image.asset('assets/chords/Fsus4 (2).png'),
-                  ],
-                ),
-              ],
-            ),
-            //G
-            ListView(
-              children: [
-                //A
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/G.png'),
-                    Image.asset('assets/chords/G (1).png'),
-                    Image.asset('assets/chords/G (2).png'),
-                    Image.asset('assets/chords/G (3).png'),
-                    Image.asset('assets/chords/G (4).png'),
-                    Image.asset('assets/chords/G (5).png'),
-                    Image.asset('assets/chords/G (6).png'),
-                    Image.asset('assets/chords/G (7).png'),
-                  ],
-                ),
-                //Am
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Gm.png'),
-                    Image.asset('assets/chords/Gm (1).png'),
-                    Image.asset('assets/chords/Gm (2).png'),
-                  ],
-                ),
-                //A7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/G7.png'),
-                    Image.asset('assets/chords/G7 (4).png'),
-                    Image.asset('assets/chords/G7 (1).png'),
-                    Image.asset('assets/chords/G7 (2).png'),
-                    Image.asset('assets/chords/G7 (3).png'),
-                  ],
-                ),
-
-                //Am7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Gm7.png'),
-                    Image.asset('assets/chords/Gm7 (1).png'),
-                    Image.asset('assets/chords/Gm7 (2).png'),
-                  ],
-                ),
-                //Amaj7
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Gmaj7.png'),
-                    Image.asset('assets/chords/Gmaj7 (1).png'),
-                    Image.asset('assets/chords/Gmaj7 (2).png'),
-                    Image.asset('assets/chords/Gmaj7 (3).png'),
-                    Image.asset('assets/chords/Gmaj7 (4).png'),
-                    Image.asset('assets/chords/Gmaj7 (5).png'),
-                  ],
-                ),
-                //Asus4
-                BannerCarousel(
-                  activeColor: Colors.red,
-                  disableColor: Colors.white,
-                  height: 400,
-                  customizedBanners: [
-                    Image.asset('assets/chords/Gsus4.png'),
-                    Image.asset('assets/chords/Gsus4 (1).png'),
-                    Image.asset('assets/chords/Gsus4 (2).png'),
-                  ],
-                ),
-              ],
-            ),
-
-          ],
-        ));
-  }
-}
-
-class Achord extends StatefulWidget {
-  const Achord({Key? key}) : super(key: key);
-
-  @override
-  State<Achord> createState() => _AchordState();
-}
-
-class _AchordState extends State<Achord> {
-  List a = constantChord['a'] as List;
-  List am = constantChord['am'] as List;
-  List a7 = constantChord['a7'] as List;
-  List am7 = constantChord['am7'] as List;
-  List amaj7 = constantChord['amaj7'] as List;
-  List asus4 = constantChord['asus4'] as List;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        //A
-        BannerCarousel(
-          activeColor: Colors.red,
-          disableColor: Colors.white,
-          height: 400,
-          customizedBanners: [
-            Image.asset('assets/chords/A.png'),
-            Image.asset('assets/chords/A (1).png'),
-            Image.asset('assets/chords/A (2).png'),
-            Image.asset('assets/chords/A (3).png'),
-            Image.asset('assets/chords/A (4).png'),
-            Image.asset('assets/chords/A (5).png'),
-            Image.asset('assets/chords/A (6).png'),
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white54,
+          indicatorColor: Colors.red,
+          tabs: const [
+            Tab(text: 'A'), Tab(text: 'B'), Tab(text: 'C'),
+            Tab(text: 'D'), Tab(text: 'E'), Tab(text: 'F'), Tab(text: 'G'),
           ],
         ),
-        //Am
-        BannerCarousel(
-          activeColor: Colors.red,
-          disableColor: Colors.white,
-          height: 400,
-          customizedBanners: [
-            Image.asset('assets/chords/Am.png'),
-            Image.asset('assets/chords/Am (1).png'),
-            Image.asset('assets/chords/Am (2).png'),
-          ],
-        ),
-        //A7
-        BannerCarousel(
-          activeColor: Colors.red,
-          disableColor: Colors.white,
-          height: 400,
-          customizedBanners: [
-            Image.asset('assets/chords/A7.png'),
-            Image.asset('assets/chords/A7 (1).png'),
-            Image.asset('assets/chords/A7 (2).png'),
-            Image.asset('assets/chords/A7 (3).png'),
-          ],
-        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: tabChords.keys.map((tabKey) {
+          List<String> chordsForThisTab = tabChords[tabKey]!;
 
-        //Am7
-        BannerCarousel(
-          activeColor: Colors.red,
-          disableColor: Colors.white,
-          height: 400,
-          customizedBanners: [
-            Image.asset('assets/chords/Am7.png'),
-            Image.asset('assets/chords/Am7 (1).png'),
-            Image.asset('assets/chords/Am7 (2).png'),
-          ],
-        ),
-        //Amaj7
-        BannerCarousel(
-          activeColor: Colors.red,
-          disableColor: Colors.white,
-          height: 400,
-          customizedBanners: [
-            Image.asset('assets/chords/Amaj7.png'),
-            Image.asset('assets/chords/Amaj7 (1).png'),
-            Image.asset('assets/chords/Amaj7 (2).png'),
-            Image.asset('assets/chords/Amaj7 (3).png'),
-            Image.asset('assets/chords/Amaj7 (4).png'),
-            Image.asset('assets/chords/Amaj7 (5).png'),
-          ],
-        ),
-        //Asus4
-        BannerCarousel(
-          activeColor: Colors.red,
-          disableColor: Colors.white,
-          height: 400,
-          customizedBanners: [
-            Image.asset('assets/chords/Asus4.png'),
-            Image.asset('assets/chords/Asus4 (1).png'),
-            Image.asset('assets/chords/Asus4 (2).png'),
-          ],
-        ),
-      ],
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            itemCount: chordsForThisTab.length,
+            itemBuilder: (context, index) {
+              return ChordDisplayCard(chordName: chordsForThisTab[index]);
+            },
+          );
+        }).toList(),
+      ),
     );
   }
 }
+
+// A BIAPI: Dot color thleng khawh nakhnga StatefulWidget ah thlen a si
+class ChordDisplayCard extends StatefulWidget {
+  final String chordName;
+  const ChordDisplayCard({super.key, required this.chordName});
+
+  @override
+  State<ChordDisplayCard> createState() => _ChordDisplayCardState();
+}
+
+class _ChordDisplayCardState extends State<ChordDisplayCard> {
+  int currentIndex = 0; // A THAR: Swipe na tuahmi page theihnak
+
+  List<dynamic> _getChordPositions() {
+    String searchKey = widget.chordName.toLowerCase();
+    var instrument = GuitarChordLibrary.instrument(InstrumentType.guitar);
+    var allKeys = instrument.getKeys(false) ?? [];
+
+    for (var k in allKeys) {
+      var chordsInKey = instrument.getChordsByKey(k) ?? [];
+      for (var c in chordsInKey) {
+        if (_isChordMatch(c.chordKey, c.suffix, searchKey)) {
+          return c.chordPositions ?? [];
+        }
+      }
+    }
+    return [];
+  }
+
+  bool _isChordMatch(String libraryKey, String librarySuffix, String searchedChord) {
+    String search = searchedChord.toLowerCase();
+    String key = libraryKey.toLowerCase();
+    String suffix = librarySuffix.toLowerCase();
+
+    if (key + suffix == search) return true;
+    if (suffix == 'major' && (search == key || search == '${key}maj')) return true;
+    if (suffix == 'minor' && (search == '${key}m' || search == '${key}min')) return true;
+    if ((suffix == 'minor7' || suffix == 'm7') && search == '${key}m7') return true;
+    if ((suffix == 'major7' || suffix == 'maj7') && search == '${key}maj7') return true;
+    if (suffix == 'dim' && search == '${key}dim') return true;
+    if (suffix == 'aug' && search == '${key}aug') return true;
+    if (suffix == 'sus4' && search == '${key}sus4') return true;
+    if (suffix == 'sus2' && search == '${key}sus2') return true;
+
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<dynamic> positions = _getChordPositions();
+
+    if (positions.isEmpty) {
+      return const SizedBox(); // Data a um lo ahcun langhter hlah
+    }
+
+    return Card(
+      color: Colors.white10,
+      margin: const EdgeInsets.only(bottom: 16,),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            // Chord Min (Title)
+            Text(
+              widget.chordName, // A THAR: StatefulWidget a si caah 'widget.' chap a hau
+              style: const TextStyle(
+                color: Colors.redAccent,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            // Chord Hmanthlak / Suaimi (PageView in Swipe tuah khawh in)
+            SizedBox(
+              height: 300,
+              width: 250,
+              child: PageView.builder(
+                itemCount: positions.length,
+                onPageChanged: (index) {
+                  // A THAR: Na Swipe fatin dot te kha a tlik ve nakhnga State thlen
+                  setState(() {
+                    currentIndex = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  var pos = positions[index];
+                  return FlutterGuitarChord(
+                    tabBackgroundColor: Colors.blue,
+                    fingerSize: 26,
+                    differentStringStrokes: true,
+                    barColor: Colors.white54,
+                    stringStroke: 1,
+                    stringColor: Colors.white,
+                    barStroke: 3,
+                    labelOpenStrings: true,
+                    firstFrameColor: Colors.blue,
+                    firstFrameStroke: 8,
+                    baseFret: pos.baseFret,
+                    chordName: '', // A cunglei ah title kan pek cang caah a lawng in chiah
+                    frets: pos.frets is List ? pos.frets.join(' ') : pos.frets.toString(),
+                    fingers: pos.fingers is List ? pos.fingers.join(' ') : pos.fingers.toString(),
+                    totalString: 6,
+                    barCount: 4,
+                    mutedColor: Colors.red,
+                    tabForegroundColor: Colors.white,
+                    labelColor: Colors.white,
+                  );
+                },
+              ),
+            ),
+
+            // Swipe tuah khawh a si ti theihternak (Dots)
+            if (positions.length > 1)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  positions.length,
+                      (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                    width: currentIndex == index ? 12.0 : 8.0,
+                    height: currentIndex == index ? 12.0 : 8.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: currentIndex == index
+                          ? Colors.redAccent // Na hmeh lio mi dot
+                          : Colors.white24, // A dang dot pawl
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 var constantChord = {
   "a": [

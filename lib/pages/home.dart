@@ -1,18 +1,27 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'package:chinlyrics/laihlalyrics/home_feed.dart';
+import 'package:chinlyrics/pages/khrihfa_hlabu.dart';
+import 'package:chinlyrics/pages/offline_home.dart';
 import 'package:chinlyrics/pages/setting.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
+import '../admin/admin.dart';
+import '../admin/uploadpage.dart';
 import '../constant.dart';
+import '../laihlalyrics/home.dart';
+import '../migrantdata.dart';
+import '../musician/home.dart';
+import '../user/profile.dart';
 import 'bible/home.dart';
-import 'chords.dart';
 import 'chawnghlang.dart';
+import 'chords.dart';
 import 'favorite.dart';
-import 'khrihfa_hlabu.dart';
-import 'offline_home.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,157 +31,288 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var decoration = const BoxDecoration(
-      color: Colors.white10,
-      borderRadius: BorderRadius.all(Radius.circular(12)));
-  var textStyle = GoogleFonts.aldrich(
-    color: Colors.white54,
-    fontWeight: FontWeight.bold,
-  );
-
-  int newAdd = 0;
-  var offlineList = [];
-  var onlineList = [];
+  final Box userBox = Hive.box('userBox');
+  bool bibleDownload = false;
+  int localSongs = 0;
+  User? user;
 
   @override
   void initState() {
-    readJsonFile();
-
-    OrientationHelper().clearPreferredOrientations();
     super.initState();
+    //UpdateChecker.checkForUpdate(context);
+    user = FirebaseAuth.instance.currentUser;
+    checkSongLength();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showWelcomeDialogIfNeeded();
+    });
+    OrientationHelper().clearPreferredOrientations();
+
+
   }
 
-  readJsonFile() async {
+
+  Future<void> checkSongLength() async {
+    // 1. Phone chung i a um ciami JSON file in la hmasa (UI a rangnak dingah)
+    await readLocalSong();
+
+    try {
+      // 2. Firebase ah hla zeizat dah a um ti a zat lawng check nak (Data a la lo, a number lawng a rel)
+      AggregateQuerySnapshot countSnapshot =
+          await FirebaseFirestore.instance.collection('hla').count().get();
+      if(!mounted) return;
+     setState(() {
+       localSongs = countSnapshot.count ?? 0;
+     });
+    } catch (e) {
+      if (kDebugMode) {
+        print("error: $e");
+      }
+    }
+  }
+
+  Future<void> readLocalSong() async {
     const fileName = 'hla'; // Specify the desired file name
     final dir = await getTemporaryDirectory();
     final filePath = '${dir.path}/$fileName';
 
-    List<dynamic> l = json.decode(await File(filePath).readAsString()) as List;
-    setState(() {
-      offlineList = l;
-    });
+    final file = File(filePath);
+    if (await file.exists()) {
+      //  await file.delete();
+      List<dynamic> l =
+          json.decode(await File(filePath).readAsString()) as List;
+
+      l.sort((a, b) => a["title"].toLowerCase().compareTo(b["title"]
+          .toLowerCase())); // Assuming you want to sort by the "title" field
+
+      if (mounted) {
+        setState(() {
+          localSongs = l.length;
+        });
+      }
+    } else {}
   }
 
-  @override
-  void dispose() {
-    OrientationHelper()
-        .setPreferredOrientations([DeviceOrientation.portraitUp]);
-    super.dispose();
+  Widget buildListTile({
+    required String title,
+    required String subtitle,
+    required IconData leadingIcon,
+    required VoidCallback onTap,
+    Widget? trailingText,
+  }) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      color: Colors.white10, // Darker card background
+      child: ListTile(
+        onTap: onTap,
+        leading: Icon(
+          leadingIcon,
+          color: Colors.blue.shade200,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+              color: Colors.blueGrey.shade200,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+              color: Colors.blueGrey.shade200,
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 1),
+        ),
+        trailing: trailingText,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: ElevatedButton(
-        onPressed: () {
-          Get.to(() => OfflineHome());
-        },
-        style: FilledButton.styleFrom(
-          backgroundColor: Colors.grey.withOpacity(0.1),
-          foregroundColor: Colors.white70, // 50% opacity
-          shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(10.0), // Creates a square button
-          ),
-        ),
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width / 1.5,
-          child: const Center(
-            child: Text('Go to all songs', style: TextStyle(letterSpacing: 2)),
-          ),
-        ),
-      )),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      body: ListView(
         children: [
-          const SizedBox(
-            height: 20,
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => OfflineHome()));
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white10, // Dark button background
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    margin: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(12.0),
+                    child: Center(
+                      child: Text(
+                        'Go to all songs ',
+                        style: TextStyle(
+                            color: Colors.blueGrey.shade200,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            letterSpacing: 1),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Favorite()));
+                  },
+                  icon: Icon(
+                    Icons.favorite,
+                    color: Colors.blueGrey.shade200,
+                  ))
+            ],
           ),
-          offlineList.isEmpty? const SizedBox(): Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Total Songs : ${offlineList.length}',
-              style: const TextStyle(
-                  color: Colors.orange, fontWeight: FontWeight.w500),
+          const SizedBox(height: 20),
+          Center(
+            child: localSongs == 0
+                ? const SizedBox()
+                : Text("Total Songs -  $localSongs",
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blueGrey.shade100,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1)),
+          ),
+          const SizedBox(height: 30),
+          Wrap(
+            spacing: 20,
+            runSpacing: 20,
+            alignment: WrapAlignment.center,
+            children: [
+              _buildCategoryButton('Bible', const BiblePage()),
+              _buildCategoryButton('Khrihfa Hlabu', const KhrihfaHlaBu()),
+              _buildCategoryButton('Chawnghlang', const ChawngHlang()),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40.0),
+            child: Divider(
+              color: Colors.white12,
+              height: 0.5,
             ),
           ),
-          const SizedBox(
-            height: 40,
-          ),
-          SizedBox(
-            //   width: MediaQuery.of(context).size.width / 1.4,
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                _buildCategoryButton('Bible', const HomeBible()),
-                _buildCategoryButton(' Khrihfa Hlabu ', const KhrihfaHlaBu()),
-                _buildCategoryButton(' Chawnghlang ', const ChawngHlang()),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 40,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0),
-            child: ListTile(
+          const SizedBox(height: 20),
+        Card(
+                  elevation: 4,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  color: Colors.white10,
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ProfilePage()),
+                      );
+                    },
+                    leading: Container(
+                      padding: const EdgeInsets.all(2),
+                      // Hmanthlak velchum i border caah
+                      decoration: const BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey[900],
+                        // Google in a lutmi nih hmanthlak an ngeih ahcun a lang lai, an ngeih lo (Email in lutmi) ahcun Icon a lang lai
+                        backgroundImage: user!.photoURL != null
+                            ? NetworkImage(user!.photoURL!)
+                            : null,
+                        child: user!.photoURL == null
+                            ? const Icon(Icons.person, color: Colors.white54)
+                            : null,
+                      ),
+                    ),
+                    title: Text(
+                      (user!.displayName) == null
+                          ? 'chinlyrics user'
+                          : user!.displayName.toString(),
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    subtitle: Text(user!.email.toString()),
+                  ),
+                ),
+                  buildListTile(
+              title: 'Admin Approval',
+              subtitle: 'Hla approve tuahnak a si.',
+              leadingIcon: Icons.admin_panel_settings,
               onTap: () {
-                Get.to(const Chords());
-              },
-              leading: const Icon(
-                Icons.back_hand_outlined,
-                color: Colors.white70,
-              ),
-              title: const Text('chord book',
-                  style: TextStyle(
-                      color: Colors.white70, fontWeight: FontWeight.bold)),
-              subtitle: const Text(
-                'Guitar chord cawnnak',
-                style: TextStyle(color: Colors.white54),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0),
-            child: ListTile(
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                        builder: (context) => const AdminApprovalPage()))
+                    .then(((result) {
+                  if (result == true) {
+
+                  }
+                }));
+              }),
+
+          buildListTile(
+              title: 'Musician Note',
+              subtitle: 'Music Note tial le tumnak.',
+              leadingIcon: Icons.piano,
               onTap: () {
-                Get.to(const Favorite());
-              },
-              leading: const Icon(
-                Icons.favorite,
-                color: Colors.white70,
-              ),
-              title: const Text('Favorite',
-                  style: TextStyle(
-                      color: Colors.white70, fontWeight: FontWeight.bold)),
-              subtitle: const Text(
-                'favorite na tuahmi zohnak',
-                style: TextStyle(color: Colors.white54),
-              ),
-            ),
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                        builder: (context) => const ChordPage()))
+                    .then(((result) {
+                  if (result == true) {
+
+                  }
+                }));
+              }),
+          buildListTile(
+            title: 'Chord Book',
+            subtitle: 'Guitar chord cawnnak',
+            leadingIcon: Icons.back_hand_outlined,
+            onTap: () {
+
+              Navigator.of(context)
+                  .push(MaterialPageRoute(
+                      builder: (context) => const ChordsLibrary()));
+            },
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0),
-            child: ListTile(
+          buildListTile(
+            title: 'Sample Home',
+            subtitle: 'Guitar chord cawnnak',
+            leadingIcon: Icons.back_hand_outlined,
+            onTap: () {
+
+              Navigator.of(context)
+                  .push(MaterialPageRoute(
+                      builder: (context) => const MainNavigationPage()));
+            }
+          ),
+          buildListTile(
+              title: 'Upload Song',
+              subtitle: 'Duhmi hla Server Ah khumhnak',
+              leadingIcon: Icons.audio_file_outlined,
               onTap: () {
-                Get.to(() => const Setting());
-              },
-              leading: const Icon(
-                Icons.settings,
-                color: Colors.white70,
-              ),
-              title: const Text('Settings',
-                  style: TextStyle(
-                      color: Colors.white70, fontWeight: FontWeight.bold)),
-              subtitle: const Text(
-                'settings le a dang dang ..',
-                style: TextStyle(color: Colors.white54),
-              ),
-            ),
-          ),
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                        builder: (context) => const UploadSongPage()))
+                    .then(((result) {
+                  if (result == true) {
+                  }
+                }));
+              }),
+          Container(),
         ],
       ),
     );
@@ -181,7 +321,7 @@ class _HomeState extends State<Home> {
   Widget _buildCategoryButton(String title, Widget page) {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           backgroundColor: Colors.white10,
           // Darker button color
           shape: RoundedRectangleBorder(
@@ -199,5 +339,59 @@ class _HomeState extends State<Home> {
                 color: Colors.blueGrey.shade200,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1)));
+  }
+
+  // A THAR: A voikhatnak login a si le si lo check nak le Dialog
+  void _showWelcomeDialogIfNeeded() {
+    // Hive chungah 'isFirstTimeLogin' ti a um le um lo a check lai (A um lo ahcun 'true' a si lai)
+    bool isFirstTime = userBox.get('isFirstTimeLogin', defaultValue: true);
+
+    if (isFirstTime) {
+      showDialog(
+        context: context,
+        barrierDismissible: false, // User nih OK button an hmeh hrimhrim a hau
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: const Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.blueAccent),
+              SizedBox(width: 10),
+              Text("Theihternak",
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
+            ],
+          ),
+          content: const Text(
+            "'Laihla Lyrics' in kan in don!\n"
+            "\n\nThis app is free to use, some ads may appear in the app. We ask for your understanding.\n\n"
+            "Hi App hi man liam hau lo in Free tein hman khawh a si caah, app chungah Ads (fakthanh) tlawmpal a rak lang kho. Na theithiamnak lai kan in nawl.",
+            style: TextStyle(color: Colors.white70, height: 1.5),
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  // 1. Dialog kan phih lai
+                  Navigator.pop(context);
+
+                  // 2. A hnu ah a langh ti lonakhnga Hive ah 'false' in kan save cang lai
+                  userBox.put('isFirstTimeLogin', false);
+                },
+                child: const Text("OK, Ka Theithiam",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

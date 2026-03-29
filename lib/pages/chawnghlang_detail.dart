@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'ChawngHlangSlide.dart';
 
@@ -63,13 +62,15 @@ class _ChawngHlangDetailState extends State<ChawngHlangDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const SizedBox(width: 1,),
+        leading: const SizedBox(
+          width: 1,
+        ),
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
             widget.title,
-            style: GoogleFonts.vastShadow(
-                color: Colors.white, fontSize: 12, letterSpacing: -1),
+            style:
+                TextStyle(color: Colors.white, fontSize: 12, letterSpacing: -1),
           ),
         ),
       ),
@@ -101,296 +102,292 @@ class _ChawngHlangDetailState extends State<ChawngHlangDetail> {
                     z10: widget.z10,
                   )));
         },
-        icon: const Icon(Icons.slideshow,color: Colors.white,),
-        label:   Text('Slide',style: GoogleFonts.vastShadow(fontWeight: FontWeight.bold,color: Colors.white),),
+        icon: const Icon(
+          Icons.slideshow,
+          color: Colors.white,
+        ),
+        label: Text(
+          'Slide',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 10,
+      body: GestureDetector(
+        onDoubleTap: () {
+          if (fontSize == 35) {
+            fontSize = fontSize - 20;
+          } else {
+            fontSize = fontSize + 5;
+          }
+          setState(() {});
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: ListView(
+            children: [
+              widget.h1 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h1,
+                        style: TextStyle(
+                            fontSize: fontSize, color: Colors.white70),
+                      ),
+                    ),
+              widget.z1 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z1,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h2 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h2,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z2 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z2,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h3 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h3,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z3 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z3,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h4 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h4,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z4 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z4,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h5 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h5,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z5 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z5,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h6 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h6,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z6 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z6,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h7 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h7,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z7 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z7,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h8 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h8,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z8 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z8,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h9 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h9,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z9 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z9,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              widget.h10 == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        widget.h10,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+              widget.z10 == null
+                  ? Container()
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, bottom: 10, top: 4),
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        widget.z10,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+              const SizedBox(
+                height: 100,
+              )
+            ],
           ),
-          Expanded(
-            flex: 5,
-            child: GestureDetector(
-              onDoubleTap: () {
-                if (fontSize == 35) {
-                  fontSize = fontSize - 20;
-                } else {
-                  fontSize = fontSize + 5;
-                }
-                setState(() {});
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: ListView(
-                  children: [
-                    widget.h1 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h1,
-                              style: GoogleFonts.alice(
-                                  fontSize: fontSize, color: Colors.white70),
-                            ),
-                          ),
-                    widget.z1 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z1,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h2 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h2,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z2 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z2,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h3 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h3,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z3 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z3,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h4 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h4,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z4 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z4,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h5 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h5,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z5 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z5,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h6 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h6,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z6 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z6,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h7 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h7,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z7 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z7,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h8 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h8,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z8 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z8,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h9 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h9,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z9 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z9,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    widget.h10 == null
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              widget.h10,
-                              style: GoogleFonts.alice(
-                                fontSize: fontSize,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                    widget.z10 == null
-                        ? Container()
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                left: 12, bottom: 10, top: 4),
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text(
-                              widget.z10,
-                              style: GoogleFonts.alatsi(
-                                fontSize: fontSize,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                    const SizedBox(
-                      height: 100,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

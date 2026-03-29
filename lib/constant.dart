@@ -16,7 +16,7 @@ const url = 'https://laihlalyrics.itrungrul.com/api/songs';
 
 
 void addFavoriteData(dynamic favoriteData) async {
-  final dir = await getTemporaryDirectory();
+  final dir = await getApplicationDocumentsDirectory();
 
   const fileName = 'favorite';
   final filePath = '${dir.path}/$fileName';
@@ -39,7 +39,7 @@ void addFavoriteData(dynamic favoriteData) async {
 }
 
 void removeFavoriteData(dynamic favoriteData) async {
-  final dir = await getTemporaryDirectory();
+  final dir = await getApplicationDocumentsDirectory();
 
   const fileName = 'favorite';
   final filePath = '${dir.path}/$fileName';
@@ -63,12 +63,14 @@ void removeFavoriteData(dynamic favoriteData) async {
 
 
 
+
+
 class OrientationHelper {
-  setPreferredOrientations(List<DeviceOrientation> orientations) {
+  Future<void> setPreferredOrientations(List<DeviceOrientation> orientations) {
     return SystemChrome.setPreferredOrientations(orientations);
   }
 
-  clearPreferredOrientations() {
+  Future<void> clearPreferredOrientations() {
     return SystemChrome.setPreferredOrientations([]);
   }
 }
